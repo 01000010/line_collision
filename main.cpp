@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <array>
 
 // The constants for the program, these could be easily saved in a properties file but for now having them as constant
 // expressions is good enough. Easy to change the parameters and they get optimized at compile time
 constexpr int MIN_AMOUNT_LINES = 10;
-constexpr int MAX_AMOUNT_LINES = 100;
+constexpr int MAX_AMOUNT_LINES = 15;
 constexpr int WIN_WIDTH = 800;
 constexpr int WIN_HEIGHT = 600;
 constexpr float MIN_LINE_SIZE = 20.0f;
@@ -164,7 +165,7 @@ Point<T> operator/(const T &t, const Point<T> &p)
 template <class T>
 std::ostream &operator<<(std::ostream &io, const Point<T> &p)
 {
-    io << "Point(x: " << p.x << "  y: " << p.y << ")";
+    io << "Point(x: " << p.x << "\ty: " << p.y << ")";
     return io;
 }
 
@@ -201,14 +202,41 @@ class Line
 template <class T>
 std::ostream &operator<<(std::ostream &io, const Line<T> &l)
 {
-    io << "Line[s: " << l.start_point << "  e: " << l.end_point << "]";
+    io << "Line[s: " << l.start_point << "\te: " << l.end_point << "]";
     return io;
+}
+
+template <class T>
+Line<T> rand_line()
+{
+    std::random_device rand_device;
+    std::mt19937 generator(rand_device());
+    std::uniform_real_distribution<> distribution_x(X_MIN, X_MAX);
+    std::uniform_real_distribution<> distribution_y(Y_MIN, Y_MAX);
+    return Line<T>(Point<T>(distribution_x(generator), distribution_y(generator)),
+                   Point<T>(distribution_x(generator), distribution_y(generator)));
+}
+
+template <class T>
+bool line_collision(const Line<T> &l1, const Line<T> l2)
+{
+    /////////////////////////////////////////////// work on this tomorrow, shit ////////////////////////////////////////////
+    // Here be magic
+    return false;
 }
 
 } // namespace lc
 
 int main()
 {
+    // Generate the lines before drawing the graphics
+    std::vector<lc::Line<float>> lines;
+    for (int i{0}; i < MAX_AMOUNT_LINES; i++)
+    {
+        lines.push_back(lc::rand_line<float>());
+    }
+
+    // Create the window and draw the graphics
     sf::RenderWindow window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), WIN_NAME);
 
     while (window.isOpen())
@@ -224,21 +252,39 @@ int main()
         }
 
         window.clear(sf::Color::White);
-        sf::Vertex line[] = {
-            sf::Vertex(sf::Vector2f(10.0f, 10.0f), sf::Color::Black),
-            sf::Vertex(sf::Vector2f(250.0f, 250.0f), sf::Color::Black)};
-        window.draw(line, 2, sf::Lines);
+
+        for (const lc::Line<float> &l : lines)
+        {
+            sf::Vertex line[] = {
+                sf::Vertex(sf::Vector2f(l.start_point.x, l.start_point.y), sf::Color::Black),
+                sf::Vertex(sf::Vector2f(l.end_point.x, l.end_point.y), sf::Color::Black)};
+            window.draw(line, 2, sf::Lines);
+        }
+
         window.display();
     }
 
-    lc::Point<float> p1(2.0f, 2.0f);
-    lc::Point<float> p2(3.0f, 3.0f);
-
-    std::cout << p1 + p2 << std::endl;
-
-    lc::Line<float> l1(p1, p2);
-
-    std::cout << l1 << std::endl;
-
     return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//// Here be dragons ////
+
+// lc::Point<float> p1(2.0f, 2.0f);
+// lc::Point<float> p2(3.0f, 3.0f);
+
+// std::cout << p1 + p2 << std::endl;
+
+// lc::Line<float> l1(p1, p2);
+
+// std::cout << l1 << std::endl;
+
+// std::cout << "Random lines:\n";
+// for (int i{0}; i < 10; i++)
+// {
+//     std::cout << lc::rand_line() << std::endl;
+// }
+
+// sf::Vertex line[] = {
+//     sf::Vertex(sf::Vector2f(l.start_point.x, l.start_point.y), sf::Color::Black),
+//     sf::Vertex(sf::Vector2f(l.end_point.x, l.end_point.y), sf::Color::Black)};
