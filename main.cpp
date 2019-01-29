@@ -206,6 +206,16 @@ std::ostream &operator<<(std::ostream &io, const Line<T> &l)
     return io;
 }
 
+// Collision class to store these values later on
+template <class T>
+class Collision
+{
+  public:
+    Point<T> collision_point;
+};
+
+// Static functions //
+
 template <class T>
 Line<T> rand_line()
 {
@@ -217,14 +227,22 @@ Line<T> rand_line()
                    Point<T>(distribution_x(generator), distribution_y(generator)));
 }
 
+// Don't forget to better comment this part
 template <class T>
 bool line_collision(const Line<T> &l1, const Line<T> l2)
 {
-    /////////////////////////////////////////////// work on this tomorrow, shit ////////////////////////////////////////////
-    // Here be magic
-    return false;
-}
+    constexpr Point<T> a{l1.start_point};
+    constexpr Point<T> b{l1.end_point};
+    constexpr Point<T> c{l2.start_point};
+    constexpr Point<T> d{l2.end_point};
 
+    float denominator{(b.x - a.x) * (d.y - c.y) - (b.y - a.y) * (d.x - c.x)};
+    float numerator1{(a.y - c.y) * (d.x - c.x) - (a.x - c.x) * (d.y - c.y)};
+    float numerator2{(a.y - c.y) * (b.x - a.x) - (a.x - c.x) * (b.y - a.y)};
+
+    // Detect if lines are overlaping...
+    // Well I think I better use the more complex thing... :(
+}
 } // namespace lc
 
 int main()
@@ -235,6 +253,15 @@ int main()
     {
         lines.push_back(lc::rand_line<float>());
     }
+
+    std::cout << "Random lines generated: " << std::endl
+              << std::endl;
+    for (const lc::Line<float> &l : lines)
+    {
+        std::cout << l << std::endl;
+    }
+
+    // Check for collision and store the points of collision
 
     // Create the window and draw the graphics
     sf::RenderWindow window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), WIN_NAME);
