@@ -5,6 +5,8 @@
 #include <vector>
 #include <random>
 #include <array>
+#include <yaml.h>
+#include <limits>
 
 // The constants for the program, these could be easily saved in a properties file but for now having them as constant
 // expressions is good enough. Easy to change the parameters and they get optimized at compile time
@@ -227,33 +229,72 @@ Line<T> rand_line()
                    Point<T>(distribution_x(generator), distribution_y(generator)));
 }
 
-// Don't forget to better comment this part
+// Quickly check if there's collision in the lines
 template <class T>
-bool line_collision(const Line<T> &l1, const Line<T> l2)
+bool are_lines_colliding(const Line<T> &l1, const Line<T> l2)
 {
-    constexpr Point<T> a{l1.start_point};
-    constexpr Point<T> b{l1.end_point};
-    constexpr Point<T> c{l2.start_point};
-    constexpr Point<T> d{l2.end_point};
+    const Point<T> a{l1.start_point};
+    const Point<T> b{l1.end_point};
+    const Point<T> c{l2.start_point};
+    const Point<T> d{l2.end_point};
 
-    float denominator{(b.x - a.x) * (d.y - c.y) - (b.y - a.y) * (d.x - c.x)};
-    float numerator1{(a.y - c.y) * (d.x - c.x) - (a.x - c.x) * (d.y - c.y)};
-    float numerator2{(a.y - c.y) * (b.x - a.x) - (a.x - c.x) * (b.y - a.y)};
+    const T denominator{(b.x - a.x) * (d.y - c.y) - (b.y - a.y) * (d.x - c.x)};
+    const T numerator1{(a.y - c.y) * (d.x - c.x) - (a.x - c.x) * (d.y - c.y)};
+    const T numerator2{(a.y - c.y) * (b.x - a.x) - (a.x - c.x) * (b.y - a.y)};
 
-    // Detect if lines are overlaping...
-    // Well I think I better use the more complex thing... :(
+    if (denominator == 0)
+    {
+        return numerator1 == 0 && numerator2 == 0;
+    }
+
+    const T r{numerator1 / denominator};
+    const T s{numerator2 / denominator};
+
+    return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
+}
+
+// Get the exact point where the collision is happening
+template <class T>
+Point<T> get_collision_point(const Line<T> &l1, const Line<T> &l2)
+{
+    const Point<T> a{l1.start_point};
+    const Point<T> b{l1.end_point};
+    const Point<T> c{l2.start_point};
+    const Point<T> d{l2.end_point};
+
+    const T a1{b.y - a.y};
+    const T b1{a.x - b.x};
+    const T c1{a1 * a.x + b1 * a.y};
+
+    const T a2{d.y - c.y};
+    const T b2{c.x - d.x};
+    const T c2{a2 * c.x + b2 * c.y};
+
+    const T determinant{a1 * b2 - a2 * b1};
+
+    if (determinant == 0)
+    {
+        return Point<T>(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    }
+    else
+    {
+        const T x{(b2 * c1 - b1 * c2) / determinant};
+        const T y{(a1 * c2 - a2 * c1) / determinant};
+        return Point<T>(x, y);
+    }
 }
 } // namespace lc
 
 int main()
 {
-    // Generate the lines before drawing the graphics
+    // Generate the random lines
     std::vector<lc::Line<float>> lines;
     for (int i{0}; i < MAX_AMOUNT_LINES; i++)
     {
         lines.push_back(lc::rand_line<float>());
     }
 
+    // Print the lines in the console
     std::cout << "Random lines generated: " << std::endl
               << std::endl;
     for (const lc::Line<float> &l : lines)
@@ -261,7 +302,36 @@ int main()
         std::cout << l << std::endl;
     }
 
-    // Check for collision and store the points of collision
+    // Store the lines generated in a yaml file
+
+    // Check for collision between the lines
+    std::vector<lc::Point<float>> collision_points;
+    for (int i{0}; i < lines.size(); i++)
+    {
+        for (int j{i}; j < lines.size(); j++)
+        {
+            if (lc::are_lines_colliding(lines[i], lines[j]))
+            {
+
+                lc::Point<float> max_p{lc::Point<float>(std::numeric_limits<float>::max(), std::numeric_limits<float>::max())};
+                lc::Point<float> p{lc::get_collision_point(lines[i], lines[j])};
+                if (p != max_p)
+                {
+                    collision_points.push_back(p);
+                }
+            }
+        }
+    }
+
+    // Print the points of collision
+    std::cout << "\nPoints where there is collision: " << std::endl
+              << std::endl;
+    for (const lc::Point<float> &p : collision_points)
+    {
+        std::cout << p << std::endl;
+    }
+
+    // Store the points of collision
 
     // Create the window and draw the graphics
     sf::RenderWindow window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), WIN_NAME);
@@ -280,6 +350,7 @@ int main()
 
         window.clear(sf::Color::White);
 
+        // Draw the generated lines
         for (const lc::Line<float> &l : lines)
         {
             sf::Vertex line[] = {
@@ -288,30 +359,19 @@ int main()
             window.draw(line, 2, sf::Lines);
         }
 
+        // Draw the points of collsion
+        for (const lc::Point<float> p : collision_points)
+        {
+            sf::CircleShape point;
+            point.setRadius(2.0f);
+            point.setOutlineColor(sf::Color::Red);
+            point.setOutlineThickness(1.0f);
+            point.setPosition(sf::Vector2f(p.x - 1, p.y - 1));
+            window.draw(point);
+        }
+
         window.display();
     }
 
     return 0;
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//// Here be dragons ////
-
-// lc::Point<float> p1(2.0f, 2.0f);
-// lc::Point<float> p2(3.0f, 3.0f);
-
-// std::cout << p1 + p2 << std::endl;
-
-// lc::Line<float> l1(p1, p2);
-
-// std::cout << l1 << std::endl;
-
-// std::cout << "Random lines:\n";
-// for (int i{0}; i < 10; i++)
-// {
-//     std::cout << lc::rand_line() << std::endl;
-// }
-
-// sf::Vertex line[] = {
-//     sf::Vertex(sf::Vector2f(l.start_point.x, l.start_point.y), sf::Color::Black),
-//     sf::Vertex(sf::Vector2f(l.end_point.x, l.end_point.y), sf::Color::Black)};
