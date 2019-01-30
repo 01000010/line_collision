@@ -1,20 +1,16 @@
-// Libraries. Usin SFML to give a visual representation of the random lines generated
+// The only libraries used are the C++ STL and SFML. SFML is used to display the results
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <random>
-#include <array>
-#include <yaml.h>
 #include <limits>
 
 // The constants for the program, these could be easily saved in a properties file but for now having them as constant
-// expressions is good enough. Easy to change the parameters and they get optimized at compile time
-constexpr int MIN_AMOUNT_LINES = 10;
-constexpr int MAX_AMOUNT_LINES = 15;
+// expressions is good enough. Easy to change the parameters and they get optimized at compile time.
+constexpr int AMOUNT_LINES = 15;
 constexpr int WIN_WIDTH = 800;
 constexpr int WIN_HEIGHT = 600;
-constexpr float MIN_LINE_SIZE = 20.0f;
 constexpr float X_MIN = 0.0f;
 constexpr float X_MAX = static_cast<float>(WIN_WIDTH);
 constexpr float Y_MIN = 0.0f;
@@ -24,14 +20,27 @@ const std::string WIN_NAME = "Line collision";
 
 namespace lc
 {
-// Each instance of the class Point has 2 properties x and y (its coordinates) coordinates in this program will work
-// quite differently than on an xy plane for the sake of saving time in not having to program ways to translate screen pixels
-// into xy coordinates and viseversa. So as of now the
+
+// The xy plane of the program is as follows:
+//
+//         (x = 0, y = 0) | (x = 1, y = 0) | (x = 2, y = 0) | ...
+//        ----------------+----------------+----------------+-----
+//         (x = 0, y = 1) | (x = 1, y = 1) | (x = 2, y = 1) | ...
+//        ----------------+----------------+----------------+-----
+//         (x = 0, y = 2) | (x = 1, y = 2) | (x = 2, y = 2) | ...
+//        ----------------+----------------+----------------+-----
+//
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Classes ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Point class. Each instance of the class Point has 2 properties x and y. Marks the place for a point.
 template <class T = float>
 class Point
 {
   public:
-    // Data
+    // Datarulers
     T x;
     T y;
 
@@ -123,8 +132,8 @@ class Point
     bool operator!=(const Point &p) const { return !operator==(p); }
 
     // Friend functions for the operators (declared inside the class defined outside of it).
-    // These may seem confusing at first or conterintuitive, they basically return a new point and are based on the already
-    // defined in-place operators. Added for the sake of completion
+    // These may seem confusing at first or conterintuitive, they basically return a new point and are based on the
+    // already defined in-place operators. Added for the sake of completion.
     template <class TT>
     friend Point<TT> operator+(const TT &t, const Point<TT> &p);
     template <class TT>
@@ -171,6 +180,7 @@ std::ostream &operator<<(std::ostream &io, const Point<T> &p)
     return io;
 }
 
+// Line class. The Line class stores 2 Point class objects, they mark the starting point and the end point of the line.
 template <class T>
 class Line
 {
@@ -201,6 +211,7 @@ class Line
     friend std::ostream &operator<<(std::ostream &io, const Line<TT> &l);
 };
 
+// Printing operator definition. (Needs to be outside of the class)
 template <class T>
 std::ostream &operator<<(std::ostream &io, const Line<T> &l)
 {
@@ -208,16 +219,12 @@ std::ostream &operator<<(std::ostream &io, const Line<T> &l)
     return io;
 }
 
-// Collision class to store these values later on
-template <class T>
-class Collision
-{
-  public:
-    Point<T> collision_point;
-};
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Static functions ///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Static functions //
-
+// rand_line() generates random x and y coordinates for the points that define the start and end of a line, that way
+// we obtain a random line. The random values are generated using uniform distribution thanks to the mt19937 method
 template <class T>
 Line<T> rand_line()
 {
@@ -229,7 +236,9 @@ Line<T> rand_line()
                    Point<T>(distribution_x(generator), distribution_y(generator)));
 }
 
-// Quickly check if there's collision in the lines
+// are_lines_colliding() takes 2 lines as arguments and returns a boolean, true if the lines passed are coliding
+// otherwise false. This is used to check if the lines are indeed intersecting and not just in the pathway of one
+// another
 template <class T>
 bool are_lines_colliding(const Line<T> &l1, const Line<T> l2)
 {
@@ -253,7 +262,10 @@ bool are_lines_colliding(const Line<T> &l1, const Line<T> l2)
     return (r >= 0 && r <= 1) && (s >= 0 && s <= 1);
 }
 
-// Get the exact point where the collision is happening
+// get_collision_point() takes 2 lines as arguments and returns a Point of the x and y position where the collision
+// between the given lines is occuring. This method should be used after are_lines_colliding() due to the way in
+// which the collision gets check. It check wether the lines share a pathway between one another and then gets the
+// point in which they meet.
 template <class T>
 Point<T> get_collision_point(const Line<T> &l1, const Line<T> &l2)
 {
@@ -285,11 +297,35 @@ Point<T> get_collision_point(const Line<T> &l1, const Line<T> &l2)
 }
 } // namespace lc
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Functions (Helpers) ////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// print_vector() it... ugh... prints vectors. On the console.
+template <class T>
+void print_vector(const std::vector<T> &v)
+{
+    for (const T &i : v)
+    {
+        std::cout << i << std::endl;
+    }
+}
+
+// save_vector() saves the information stored in the vectors into a txt file.
+template <class T>
+void save_vector(const std::vector<T> &v, const std::string &filename)
+{
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Main program ///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int main()
 {
     // Generate the random lines
     std::vector<lc::Line<float>> lines;
-    for (int i{0}; i < MAX_AMOUNT_LINES; i++)
+    for (int i{0}; i < AMOUNT_LINES; i++)
     {
         lines.push_back(lc::rand_line<float>());
     }
@@ -297,12 +333,9 @@ int main()
     // Print the lines in the console
     std::cout << "Random lines generated: " << std::endl
               << std::endl;
-    for (const lc::Line<float> &l : lines)
-    {
-        std::cout << l << std::endl;
-    }
+    print_vector(lines);
 
-    // Store the lines generated in a yaml file
+    // Store the lines generated in file
 
     // Check for collision between the lines
     std::vector<lc::Point<float>> collision_points;
@@ -310,15 +343,11 @@ int main()
     {
         for (int j{i}; j < lines.size(); j++)
         {
-            if (lc::are_lines_colliding(lines[i], lines[j]))
+            if (lc::are_lines_colliding(lines[i], lines[j])) // Are the lines touching?
             {
-
-                lc::Point<float> max_p{lc::Point<float>(std::numeric_limits<float>::max(), std::numeric_limits<float>::max())};
+                // If so check where exactly is where they touch.
                 lc::Point<float> p{lc::get_collision_point(lines[i], lines[j])};
-                if (p != max_p)
-                {
-                    collision_points.push_back(p);
-                }
+                collision_points.push_back(p);
             }
         }
     }
@@ -326,10 +355,7 @@ int main()
     // Print the points of collision
     std::cout << "\nPoints where there is collision: " << std::endl
               << std::endl;
-    for (const lc::Point<float> &p : collision_points)
-    {
-        std::cout << p << std::endl;
-    }
+    print_vector(collision_points);
 
     // Store the points of collision
 
@@ -370,6 +396,7 @@ int main()
             window.draw(point);
         }
 
+        // Show they window
         window.display();
     }
 
