@@ -5,6 +5,7 @@
 #include <vector>
 #include <random>
 #include <limits>
+#include <fstream>
 
 // The constants for the program, these could be easily saved in a properties file but for now having them as constant
 // expressions is good enough. Easy to change the parameters and they get optimized at compile time.
@@ -29,6 +30,7 @@ namespace lc
 //        ----------------+----------------+----------------+-----
 //         (x = 0, y = 2) | (x = 1, y = 2) | (x = 2, y = 2) | ...
 //        ----------------+----------------+----------------+-----
+//               ...      |       ...      |       ...      |
 //
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -295,6 +297,13 @@ Point<T> get_collision_point(const Line<T> &l1, const Line<T> &l2)
         return Point<T>(x, y);
     }
 }
+
+template <class T>
+void split_colliding_lines(std::vector<lc::Line<T>> &out, lc::Line<T> &l, const lc::Point<T> collision_point,
+                           const T &scaling = 1.0f)
+{
+    
+}
 } // namespace lc
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -315,6 +324,12 @@ void print_vector(const std::vector<T> &v)
 template <class T>
 void save_vector(const std::vector<T> &v, const std::string &filename)
 {
+    std::ofstream save(filename);
+    for (const T &i : v)
+    {
+        save << i << std::endl;
+    }
+    save.close();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -325,6 +340,7 @@ int main()
 {
     // Generate the random lines
     std::vector<lc::Line<float>> lines;
+
     for (int i{0}; i < AMOUNT_LINES; i++)
     {
         lines.push_back(lc::rand_line<float>());
@@ -336,9 +352,11 @@ int main()
     print_vector(lines);
 
     // Store the lines generated in file
+    save_vector(lines, "lines.txt");
 
     // Check for collision between the lines
     std::vector<lc::Point<float>> collision_points;
+
     for (int i{0}; i < lines.size(); i++)
     {
         for (int j{i}; j < lines.size(); j++)
@@ -347,7 +365,13 @@ int main()
             {
                 // If so check where exactly is where they touch.
                 lc::Point<float> p{lc::get_collision_point(lines[i], lines[j])};
-                collision_points.push_back(p);
+                // Max point to compare
+                lc::Point<float> p_max(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+
+                if (p != p_max)
+                {
+                    collision_points.push_back(p);
+                }
             }
         }
     }
@@ -358,6 +382,7 @@ int main()
     print_vector(collision_points);
 
     // Store the points of collision
+    save_vector(collision_points, "col_points.txt");
 
     // Create the window and draw the graphics
     sf::RenderWindow window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), WIN_NAME);
@@ -392,7 +417,7 @@ int main()
             point.setRadius(2.0f);
             point.setOutlineColor(sf::Color::Red);
             point.setOutlineThickness(1.0f);
-            point.setPosition(sf::Vector2f(p.x - 1, p.y - 1));
+            point.setPosition(sf::Vector2f(p.x - 2.0f, p.y - 2.0f));
             window.draw(point);
         }
 
