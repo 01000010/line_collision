@@ -242,7 +242,7 @@ Line<T> rand_line()
 // otherwise false. This is used to check if the lines are indeed intersecting and not just in the pathway of one
 // another
 template <class T>
-bool are_lines_colliding(const Line<T> &l1, const Line<T> l2)
+bool are_lines_colliding(const Line<T> &l1, const Line<T> &l2)
 {
     const Point<T> a{l1.start_point};
     const Point<T> b{l1.end_point};
@@ -296,13 +296,6 @@ Point<T> get_collision_point(const Line<T> &l1, const Line<T> &l2)
         const T y{(a1 * c2 - a2 * c1) / determinant};
         return Point<T>(x, y);
     }
-}
-
-template <class T>
-void split_colliding_lines(std::vector<lc::Line<T>> &out, lc::Line<T> &l, const lc::Point<T> collision_point,
-                           const T &scaling = 1.0f)
-{
-    
 }
 } // namespace lc
 
@@ -411,7 +404,7 @@ int main()
         }
 
         // Draw the points of collsion
-        for (const lc::Point<float> p : collision_points)
+        for (const lc::Point<float> &p : collision_points)
         {
             sf::CircleShape point;
             point.setRadius(2.0f);
