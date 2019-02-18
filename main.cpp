@@ -8,19 +8,18 @@
 #include <fstream>
 #include <iomanip>
 
-constexpr int AMOUNT_LINES = 15;
-constexpr int WIN_WIDTH = 800;
-constexpr int WIN_HEIGHT = 600;
-constexpr float X_MIN = 0.0f;
-constexpr float X_MAX = static_cast<float>(WIN_WIDTH);
-constexpr float Y_MIN = 0.0f;
-constexpr float Y_MAX = static_cast<float>(WIN_HEIGHT);
+constexpr int AMOUNT_LINES{ 15 };
+constexpr int WIN_WIDTH{ 800 };
+constexpr int WIN_HEIGHT{ 600 };
+constexpr float X_MIN{ 0.0f };
+constexpr float X_MAX{ static_cast<float>(WIN_WIDTH) };
+constexpr float Y_MIN{ 0.0f };
+constexpr float Y_MAX{ static_cast<float>(WIN_HEIGHT) };
 
-const std::string WIN_NAME = "Line collision";
+const std::string WIN_NAME{ "Line collision" };
 
 namespace lc
 {
-
     // The xy plane of the program is as follows:
     //
     //         (x = 0, y = 0) | (x = 1, y = 0) | (x = 2, y = 0) | ...
@@ -46,12 +45,12 @@ namespace lc
         T y;
 
         // Constructors
-        Point(const T &x, const T &y) : x(x), y(y) {};
+        Point(const T& x, const T& y) : x(x), y(y) {};
         Point() : x(T()), y(T()) {};
 
         // Copy-constructors
-        Point(const Point &p) : x(p.x), y(p.y) {};
-        Point &operator=(const Point &p)
+        Point(const Point& p) : x(p.x), y(p.y) {};
+        Point& operator=(const Point& p)
         {
             x = p.x;
             y = p.y;
@@ -59,28 +58,28 @@ namespace lc
         }
 
         // In-place operators (Point and Point)
-        Point &operator+=(const Point &p)
+        Point& operator+=(const Point& p)
         {
             x += p.x;
             y += p.y;
             return *this;
         }
 
-        Point &operator-=(const Point &p)
+        Point& operator-=(const Point& p)
         {
             x -= p.x;
             y -= p.y;
             return *this;
         }
 
-        Point &operator*=(const Point &p)
+        Point& operator*=(const Point& p)
         {
             x *= p.x;
             y *= p.y;
             return *this;
         }
 
-        Point &operator/=(const Point &p)
+        Point& operator/=(const Point& p)
         {
             x /= p.x;
             y /= p.y;
@@ -88,28 +87,28 @@ namespace lc
         }
 
         // In-place operators (Point and T (for scaling porpuses, maybe))
-        Point &operator+=(const T &t)
+        Point& operator+=(const T& t)
         {
             x += t;
             y += t;
             return *this;
         }
 
-        Point &operator-=(const T &t)
+        Point& operator-=(const T& t)
         {
             x -= t;
             y -= t;
             return *this;
         }
 
-        Point &operator*=(const T &t)
+        Point& operator*=(const T& t)
         {
             x *= t;
             y *= t;
             return *this;
         }
 
-        Point &operator/=(const T &t)
+        Point& operator/=(const T& t)
         {
             x /= t;
             y /= t;
@@ -117,65 +116,65 @@ namespace lc
         }
 
         // Binary operators (Point and Point)
-        Point operator+(const Point &p) const { return Point(*this) += p; }
-        Point operator-(const Point &p) const { return Point(*this) -= p; }
-        Point operator*(const Point &p) const { return Point(*this) *= p; }
-        Point operator/(const Point &p) const { return Point(*this) /= p; }
+        Point operator+(const Point& p) const { return Point(*this) += p; }
+        Point operator-(const Point& p) const { return Point(*this) -= p; }
+        Point operator*(const Point& p) const { return Point(*this) *= p; }
+        Point operator/(const Point& p) const { return Point(*this) /= p; }
 
         // Binary operators (Point and T (for scaling porpuses, maybe))
-        Point operator+(const T &t) const { return Point(*this) += t; }
-        Point operator-(const T &t) const { return Point(*this) -= t; }
-        Point operator*(const T &t) const { return Point(*this) *= t; }
-        Point operator/(const T &t) const { return Point(*this) /= t; }
+        Point operator+(const T& t) const { return Point(*this) += t; }
+        Point operator-(const T& t) const { return Point(*this) -= t; }
+        Point operator*(const T& t) const { return Point(*this) *= t; }
+        Point operator/(const T& t) const { return Point(*this) /= t; }
 
         // Comparison operators
-        bool operator==(const Point &p) const { return x == p.x && y == p.y; }
-        bool operator!=(const Point &p) const { return !operator==(p); }
+        bool operator==(const Point& p) const { return x == p.x && y == p.y; }
+        bool operator!=(const Point& p) const { return !operator==(p); }
 
         // Friend functions for the operators (declared inside the class defined outside of it).
         // These may seem confusing at first or conterintuitive, they basically return a new point and are based on the
         // already defined in-place operators. Added for the sake of completion.
         template <class T>
-        friend Point<T> operator+(const T &t, const Point<T> &p);
+        friend Point<T> operator+(const T& t, const Point<T>& p);
         template <class T>
-        friend Point<T> operator-(const T &t, const Point<T> &p);
+        friend Point<T> operator-(const T& t, const Point<T>& p);
         template <class T>
-        friend Point<T> operator*(const T &t, const Point<T> &p);
+        friend Point<T> operator*(const T& t, const Point<T>& p);
         template <class T>
-        friend Point<T> operator/(const T &t, const Point<T> &p);
+        friend Point<T> operator/(const T& t, const Point<T>& p);
 
         // Printing operator (<<)
         template <class T>
-        friend std::ostream &operator<<(std::ostream &io, const Point<T> &p);
+        friend std::ostream& operator<<(std::ostream& io, const Point<T>& p);
     };
 
     // Friend functions definitions need to be outside of the class
     template <class T>
-    Point<T> operator+(const T &t, const Point<T> &p)
+    Point<T> operator+(const T& t, const Point<T>& p)
     {
         return p + t;
     }
 
     template <class T>
-    Point<T> operator-(const T &t, const Point<T> &p)
+    Point<T> operator-(const T& t, const Point<T>& p)
     {
         return p - t;
     }
 
     template <class T>
-    Point<T> operator*(const T &t, const Point<T> &p)
+    Point<T> operator*(const T& t, const Point<T>& p)
     {
         return p * t;
     }
 
     template <class T>
-    Point<T> operator/(const T &t, const Point<T> &p)
+    Point<T> operator/(const T& t, const Point<T>& p)
     {
         return p / t;
     }
 
     template <class T>
-    std::ostream &operator<<(std::ostream &io, const Point<T> &p)
+    std::ostream& operator<<(std::ostream& io, const Point<T>& p)
     {
         io << "Point(x: " << std::setw(8) << p.x << " y: " << std::setw(8) << p.y << ")";
         return io;
@@ -195,8 +194,8 @@ namespace lc
         Line(const Point<T> start, const Point<T> end) : start_point(start), end_point(end) {}
 
         // Copy constructors
-        Line(const Line &l) : start_point(l.start_point), end_point(l.end_point) {}
-        Line &operator=(const Line &l)
+        Line(const Line& l) : start_point(l.start_point), end_point(l.end_point) {}
+        Line& operator=(const Line& l)
         {
             start_point = l.start_point;
             start_point = l.end_point;
@@ -204,17 +203,17 @@ namespace lc
         }
 
         // Comparison operands
-        bool operator==(const Line &l) const { return start_point == l.start_point && end_point == l.end_point; }
-        bool operator!=(const Line &l) const { return !operator==(l); }
+        bool operator==(const Line& l) const { return start_point == l.start_point && end_point == l.end_point; }
+        bool operator!=(const Line& l) const { return !operator==(l); }
 
         // Printing operator (<<)
         template <class T>
-        friend std::ostream &operator<<(std::ostream &io, const Line<T> &l);
+        friend std::ostream& operator<<(std::ostream& io, const Line<T>& l);
     };
 
     // Printing operator definition. (Needs to be outside of the class)
     template <class T>
-    std::ostream &operator<<(std::ostream &io, const Line<T> &l)
+    std::ostream& operator<<(std::ostream& io, const Line<T>& l)
     {
         io << "Line[s: " << std::setw(8) << l.start_point << " e: " << std::setw(8) << l.end_point << "]";
         return io;
@@ -233,15 +232,21 @@ namespace lc
         std::mt19937 generator(rand_device());
         std::uniform_real_distribution<> distribution_x(X_MIN, X_MAX);
         std::uniform_real_distribution<> distribution_y(Y_MIN, Y_MAX);
-        return Line<T>(Point<T>(distribution_x(generator), distribution_y(generator)),
-            Point<T>(distribution_x(generator), distribution_y(generator)));
+
+        return Line<T>(
+            Point<T>(
+                static_cast<T>(distribution_x(generator)),
+                static_cast<T>(distribution_y(generator))),
+            Point<T>(
+                static_cast<T>(distribution_x(generator)),
+                static_cast<T>(distribution_y(generator))));
     }
 
     // are_lines_colliding() takes 2 lines as arguments and returns a boolean, true if the lines passed are coliding
     // otherwise false. This is used to check if the lines are indeed intersecting and not just in the pathway of one
     // another
     template <class T>
-    bool are_lines_colliding(const Line<T> &l1, const Line<T> &l2)
+    bool are_lines_colliding(const Line<T>& l1, const Line<T>& l2)
     {
         const Point<T> a{ l1.start_point };
         const Point<T> b{ l1.end_point };
@@ -268,7 +273,7 @@ namespace lc
     // which the collision gets check. It check wether the lines share a pathway between one another and then gets the
     // point in which they meet.
     template <class T>
-    Point<T> get_collision_point(const Line<T> &l1, const Line<T> &l2)
+    Point<T> get_collision_point(const Line<T>& l1, const Line<T>& l2)
     {
         const Point<T> a{ l1.start_point };
         const Point<T> b{ l1.end_point };
@@ -304,9 +309,9 @@ namespace lc
 
 // print_vector() it... ugh... prints vectors. On the console.
 template <class T>
-void print_vector(const std::vector<T> &v)
+void print_vector(const std::vector<T>& v)
 {
-    for (const T &i : v)
+    for (const T& i : v)
     {
         std::cout << i << std::endl;
     }
@@ -314,11 +319,11 @@ void print_vector(const std::vector<T> &v)
 
 // save_vector() saves the information stored in the vectors into a txt file.
 template <class T>
-void save_vector(const std::vector<T> &v, const std::string &filename)
+void save_vector(const std::vector<T>& v, const std::string& filename)
 {
     std::ofstream save(filename);
 
-    for (const T &i : v)
+    for (const T& i : v)
     {
         save << i << std::endl;
     }
@@ -351,9 +356,9 @@ int main()
     // Check for collision between the lines
     std::vector<lc::Point<float>> collision_points;
 
-    for (int i{ 0 }; i < lines.size(); i++)
+    for (size_t i{ 0 }; i < lines.size(); i++)
     {
-        for (int j{ i }; j < lines.size(); j++)
+        for (size_t j{ i }; j < lines.size(); j++)
         {
             if (lc::are_lines_colliding(lines[i], lines[j])) // Are the lines touching?
             {
@@ -396,7 +401,7 @@ int main()
         window.clear(sf::Color::White);
 
         // Draw the generated lines
-        for (const lc::Line<float> &l : lines)
+        for (const lc::Line<float>& l : lines)
         {
             sf::Vertex line[] = {
                 sf::Vertex(sf::Vector2f(l.start_point.x, l.start_point.y), sf::Color::Black),
@@ -405,7 +410,7 @@ int main()
         }
 
         // Draw the points of collsion
-        for (const lc::Point<float> &p : collision_points)
+        for (const lc::Point<float>& p : collision_points)
         {
             sf::CircleShape point;
             point.setRadius(2.0f);
