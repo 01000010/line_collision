@@ -25,6 +25,7 @@ namespace lc
         {
             start = line.start;
             end = line.end;
+
             return *this;
         }
 
@@ -39,5 +40,13 @@ namespace lc
             return !operator==(line);
         }
     };
+
+    template<typename T>
+    inline std::ostream& operator<<(std::ostream& stream, const Line<T>& line)
+    {
+        stream << "[sp:" << line.start << " ep:" << line.end << ']';
+
+        return stream;
+    }
 }
 #endif

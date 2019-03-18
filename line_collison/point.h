@@ -35,5 +35,13 @@ namespace lc {
             return !operator==(p);
         }
     };
+
+    template<typename T>
+    inline std::ostream& operator<<(std::ostream& stream, const Point<T>& point)
+    {
+        stream << "(x:" << point.x << " y:" << point.y << ')';
+
+        return stream;
+    }
 }
 #endif
