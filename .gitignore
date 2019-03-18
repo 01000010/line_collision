@@ -4,3 +4,15 @@
 
 /.vs
 /line_collison/.vs/line_collison/v16
+/line_collison/Release
+/line_collison/Debug/line_collison.tlog
+/line_collison/Debug/vc142.pdb
+/line_collison/Debug/vc142.idb
+/line_collison/Debug/sfml-window-d-2.dll
+/line_collison/Debug/sfml-system-d-2.dll
+/line_collison/Debug/sfml-graphics-d-2.dll
+/line_collison/Debug/openal32.dll
+/line_collison/Debug/main.obj
+/line_collison/Debug/line_collison.pdb
+/line_collison/Debug/line_collison.ilk
+/line_collison/Debug/line_collison.exe
