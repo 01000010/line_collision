@@ -1,36 +1,28 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <iostream>
+
 namespace lc {
     template<typename T = float>
-    class Point
+    class Point final
     {
     private:
         T x{};
         T y{};
 
     public:
-        // Constructor and destructor
+        // Constructors and destructor - following rule of zero
         Point(const T& x, const T& y) : x{ x }, y{ y } {}
-        Point(const Point& p) : Point(p.x, p.y) {}
         Point() = default;
-        ~Point() = default;
-
-        // Assignment overload
-        Point& operator=(const Point& p)
-        {
-            x = p.x;
-            y = p.y;
-            return *this;
-        }
 
         // Comparison operators
-        bool operator==(const Point& p) const
+        bool operator==(const Point& p) const noexcept
         {
             return x == p.x && y == p.y;
         }
 
-        bool operator!=(const Point& p) const
+        bool operator!=(const Point& p) const noexcept
         {
             return !operator==(p);
         }

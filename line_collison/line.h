@@ -13,29 +13,18 @@ namespace lc
         Point<T> end{};
 
     public:
-        // Constructors and destructor
+        // Constructors and destructor - following rule of zero
         Line(const Point<T>& start_point, const Point<T>& end_point)
             : start{ start_point }, end{ end_point } {}
-        Line(const Line<T>& line) : Line(line.start, line.end) {}
         Line() = default;
-        ~Line() = default;
-
-        // Assignment overload
-        Line& operator=(const Line<T>& line)
-        {
-            start = line.start;
-            end = line.end;
-
-            return *this;
-        }
 
         // Comparison operators
-        bool operator==(const Line<T>& line)
+        bool operator==(const Line<T>& line) const noexcept
         {
             return start == line.start && end == line.end;
         }
 
-        bool operator!=(const Line<T>& line)
+        bool operator!=(const Line<T>& line) const noexcept
         {
             return !operator==(line);
         }
