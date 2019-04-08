@@ -5,37 +5,36 @@
 
 namespace lc
 {
-    template<typename T = float>
     class Line
     {
-    private:
-        Point<T> start{};
-        Point<T> end{};
-
     public:
-        // Constructors and destructor - following rule of zero
-        Line(const Point<T>& start_point, const Point<T>& end_point)
+        Point start{};
+        Point end{};
+
+        Line(const Point& start_point, const Point& end_point)
             : start{ start_point }, end{ end_point } {}
+        Line(Point&& start_point, Point&& end_point)
+            : start{ std::move(start_point) }, end{ std::move(end_point) } {}
         Line() = default;
 
-        // Comparison operators
-        bool operator==(const Line<T>& line) const noexcept
+        bool operator==(const Line& line) const noexcept
         {
             return start == line.start && end == line.end;
         }
 
-        bool operator!=(const Line<T>& line) const noexcept
+        bool operator!=(const Line& line) const noexcept
         {
             return !operator==(line);
         }
     };
 
     template<typename T>
-    inline std::ostream& operator<<(std::ostream& stream, const Line<T>& line)
+    inline std::ostream& operator<<(std::ostream& stream, const Line& line)
     {
         stream << "[sp:" << line.start << " ep:" << line.end << ']';
 
         return stream;
     }
 }
+
 #endif
