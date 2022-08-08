@@ -284,7 +284,7 @@ template<typename T>
 void print_vector(const std::vector<T>& v)
 {
 	for (const T& i : v) {
-		std::cout << i << std::endl;
+		std::cout << i << '\n';
 	}
 }
 
@@ -294,7 +294,7 @@ void save_vector(const std::vector<T>& v, std::string_view filename)
 	std::ofstream save{ filename.data() };
 
 	for (const T& i : v) {
-		save << i << std::endl;
+		save << i << '\n';
 	}
 
 	save.close();
@@ -340,7 +340,9 @@ int main()
 	std::cout << "\nPoints where there is collision:\n\n";
 	print_vector(collision_points);
 
-	sf::RenderWindow window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), WIN_NAME.data());
+	sf::ContextSettings settings;
+	settings.antialiasingLevel = 8;
+	sf::RenderWindow window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), WIN_NAME.data(), sf::Style::Close, settings);
 	sf::Texture image_buffer{};
 	sf::Vector2u size_data{ window.getSize() };
 
@@ -386,12 +388,14 @@ int main()
 			window.draw(line, 2, sf::Lines);
 		}
 
-		for (const lc::Point<float>& p : collision_points) {
-			sf::CircleShape point;
+		static sf::CircleShape point;
 
-			point.setRadius(2.0f);
-			point.setOutlineColor(sf::Color::Red);
-			point.setOutlineThickness(1.0f);
+		point.setRadius(2.0f);
+		point.setOutlineColor(sf::Color::Red);
+		point.setFillColor(sf::Color::Transparent);
+		point.setOutlineThickness(1.0f);
+
+		for (const lc::Point<float>& p : collision_points) {
 			point.setPosition(sf::Vector2f(p.x - 2.0f, p.y - 2.0f));
 			window.draw(point);
 		}
